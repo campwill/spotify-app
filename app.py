@@ -34,6 +34,40 @@ def index():
     if session.get('access_token'):
         return redirect('/dashboard')
     return render_template('index.html', auth_url=get_auth_url())
+
+@app.route('/callback')
+def callback():
+    code = request.args.get("code")
+    
+    payload = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": SPOTIFY_REDIRECT_URI,
+        "client_id": SPOTIFY_CLIENT_ID,
+        "client_secret": SPOTIFY_CLIENT_SECRET,
+    }
+
+    response = requests.post(SPOTIFY_TOKEN_URL, data=payload)
+    response_data = response.json()
+    access_token = response_data.get("access_token")
+    refresh_token = response_data.get("refresh_token")
+    expires_in = response_data.get("expires_in")
+    headers = {"Authorization": f"Bearer {access_token}"}
+    user_profile = requests.get(f"{SPOTIFY_API_BASE_URL}/me", headers=headers).json()
+
+    user_id = user_profile["id"]
+    display_name = user_profile.get("display_name")
+    email = user_profile.get("email")
+
+    # Save to DB
+    #db.save_user(user_id, display_name, email, access_token, refresh_token, expires_in)
+
+    # Save to session
+    session['user_id'] = user_id
+    session['access_token'] = access_token
+
+    return redirect('/dashboard')
+
 @app.route('/dashboard')
 def dashboard():
     token = session.get('access_token')
@@ -81,8 +115,6 @@ def recently_played():
     response = requests.get(f"{SPOTIFY_API_BASE_URL}/me/player/recently-played?limit=50", headers=headers)
     data = response.json()
     return render_template("recently_played.html", tracks=data['items'])
-
-
 
 @app.route('/album-search')
 def album_search():
