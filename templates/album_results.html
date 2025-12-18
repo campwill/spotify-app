@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Album Results{% endblock %}
+
+{% block content %}
+<h1>Select an Album</h1>
+
+<ul>
+  {% for album in albums %}
+    <li>
+      <a href="{{ url_for('album_tournament', album_id=album.id) }}">
+        {{ album.name }} – {{ album.artists[0].name }}
+        ({{ album.release_date[:4] }})
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

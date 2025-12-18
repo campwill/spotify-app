@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Album Search{% endblock %}
+
+{% block content %}
+<h1>Search for Album</h1>
+<form action="{{ url_for('album_results') }}" method="get">
+  <input type="text" name="album", placeholder="Enter Album Name" required>
+  <button type="submit">Search</button>
+</form>
+{% endblock %}

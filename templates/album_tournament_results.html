@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Album Tournament{% endblock %}
+
+{% block content %}
+<h1>Track Tournament</h1>
+
+<div id="match-container">
+  <p id="match-text"></p>
+  <button id="track1-btn"></button>
+  <button id="track2-btn"></button>
+</div>
+
+<h2>Current Scores</h2>
+<ul id="score-list">
+  {% for track in tracks %}
+    <li data-id="{{ track.id }}">{{ track.name }} – Score: 0</li>
+  {% endfor %}
+</ul>
+
+<h2 id="final-ranking" style="display:none;">Final Ranking</h2>
+<ol id="ranking-list"></ol>
+
+<script>
+const tracks = {{ tracks | tojson }};
+let scores = {};
+tracks.forEach(t => scores[t.id] = 0);
+
+// Create a shuffled array of matches
+let matchQueue = [...tracks];
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+shuffle(matchQueue);
+
+let currentIndex = 0;
+
+function updateScores() {
+    const scoreList = document.getElementById("score-list");
+    scoreList.innerHTML = "";
+    tracks.forEach(track => {
+        const li = document.createElement("li");
+        li.textContent = `${track.name} – Score: ${scores[track.id]}`;
+        scoreList.appendChild(li);
+    });
+}
+
+function showNextMatch() {
+    if (currentIndex >= matchQueue.length - 1) {
+        showFinalRanking();
+        return;
+    }
+    const t1 = matchQueue[currentIndex];
+    const t2 = matchQueue[currentIndex + 1];
+    document.getElementById("match-text").textContent = "Which track do you prefer?";
+    document.getElementById("track1-btn").textContent = t1.name;
+    document.getElementById("track2-btn").textContent = t2.name;
+
+    document.getElementById("track1-btn").onclick = () => chooseWinner(t1.id);
+    document.getElementById("track2-btn").onclick = () => chooseWinner(t2.id);
+}
+
+function chooseWinner(trackId) {
+    scores[trackId]++;
+    updateScores();
+    currentIndex += 2;
+    showNextMatch();
+}
+
+function showFinalRanking() {
+    document.getElementById("match-container").style.display = "none";
+    const rankingList = document.getElementById("ranking-list");
+    rankingList.innerHTML = "";
+    const sortedTracks = [...tracks].sort((a,b) => scores[b.id] - scores[a.id]);
+    sortedTracks.forEach(track => {
+        const li = document.createElement("li");
+        li.textContent = `${track.name} – Score: ${scores[track.id]}`;
+        rankingList.appendChild(li);
+    });
+    document.getElementById("final-ranking").style.display = "block";
+}
+
+updateScores();
+showNextMatch();
+</script>
+{% endblock %}

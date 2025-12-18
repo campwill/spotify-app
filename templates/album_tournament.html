@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Album Tournament{% endblock %}
+
+{% block content %}
+<h1>Track Tournament</h1>
+
+<div id="match-container">
+  <p id="match-text"></p>
+  <button id="track1-btn"></button>
+  <button id="track2-btn"></button>
+</div>
+
+<h2 id="score-title">Current Scores</h2>
+<ul id="score-list"></ul>
+
+<h2 id="final-ranking" style="display:none;">Final Ranking</h2>
+<ol id="ranking-list"></ol>
+
+<script>
+  // create matches
+  // shuffle matches
+  // show current match
+  // update rankings
+  // jmp 3 til all matches are done
+const tracks = {{ tracks | tojson }};
+
+let scores = {};
+tracks.forEach(t => scores[t.id] = 0);
+
+let matches = [];
+for (let i = 0; i < tracks.length; i++) {
+    for (let j = i + 1; j < tracks.length; j++) {
+        matches.push([tracks[i], tracks[j]]);
+    }
+}
+//rondomizes the matches
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+shuffle(matches);
+
+let currentIndex = 0;
+
+function updateScores() {
+    const scoreList = document.getElementById("score-list");
+    scoreList.innerHTML = "";
+
+    const sorted = [...tracks].sort((a,b) => scores[b.id] - scores[a.id]);
+    sorted.forEach(track => {
+        const ol = document.createElement("ol");
+        ol.textContent = `${track.name} – Score: ${scores[track.id]}`;
+        scoreList.appendChild(ol);
+    });
+}
+
+function showNextMatch() {
+    if (currentIndex >= matches.length) {
+        showFinalRanking();
+        return;
+    }
+    const [t1, t2] = matches[currentIndex];
+
+    document.getElementById("match-text").textContent = "Which track do you prefer?";
+    document.getElementById("track1-btn").textContent = t1.name;
+    document.getElementById("track2-btn").textContent = t2.name;
+
+    document.getElementById("track1-btn").onclick = () => chooseWinner(t1.id);
+    document.getElementById("track2-btn").onclick = () => chooseWinner(t2.id);
+}
+
+function chooseWinner(trackId) {
+    scores[trackId]++;
+    updateScores();
+    currentIndex++;
+    showNextMatch();
+}
+
+// Update the display so the final rankings are shown
+function showFinalRanking() {
+    document.getElementById("match-container").style.display = "none";
+
+    document.getElementById("score-title").textContent = "Final Ranking";
+
+}
+
+updateScores();
+showNextMatch();
+</script>
+{% endblock %}
