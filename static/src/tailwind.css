@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.form-input {
+  @apply px-6 py-3 border-4 border-red-500 rounded-lg bg-yellow-200 text-red-700 font-bold;
+}
