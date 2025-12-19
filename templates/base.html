@@ -3,32 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Spotify Dashboard{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
 </head>
-<body>
-    <header>
-        <nav class="navbar">
-            <div class="nav-links">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/top-tracks">Top Tracks</a>
-                <a href="/top-artists">Top Artists</a>
-                <a href="/recently-played">Recently Played</a>
-                <a href="/album-search">Rank Tracklist</a>
-                <a href="/logout">Logout</a>
+<body class="bg-neutral-50 text-neutral-800 font-sans">
 
+<header class="bg-white border-b border-neutral-200">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+
+            <div class="flex-shrink-0">
+                <a href="/dashboard" class="text-sm tracking-[0.3em] uppercase text-neutral-600 hover:text-[#1DB954] transition-colors duration-500">
+                    Spotify Dashboard
+                </a>
             </div>
-        </nav>
-    </header>
+            <!-- POOKIE, FOR REFERENCE THE SPOTIFY GREEN IS:  #1DB954--> 
+            <div class="hidden md:flex space-x-6 uppercase text-[9px] tracking-[0.3em]">
+                <a href="/dashboard" class="text-neutral-600 hover:text-[#1DB954] transition-colors duration-500">Dashboard</a>
+                <a href="/top-tracks" class="text-neutral-600 hover:text-[#1DB954] transition-colors duration-500">Top Tracks</a>
+                <a href="/top-artists" class="text-neutral-600 hover:text-[#1DB954] transition-colors duration-500">Top Artists</a>
+                <a href="/recently-played" class="text-neutral-600 hover:text-[#1DB954] transition-colors duration-500">Recently Played</a>
+                <a href="/album-search" class="text-neutral-600 hover:text-[#1DB954] transition-colors duration-500">Rank Tracklist</a>
+                <a href="/logout" class="text-red-500 hover:text-red-700 transition-colors duration-500">Logout</a>
+            </div>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+        </div>
+    </nav>
+</header>
 
-    <footer>
-        <hr>
-        <p>&copy; 2025 Your Name. All rights reserved.</p>
-    </footer>
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="mt-12 text-center text-neutral-500 text-xs tracking-wide uppercase">
+    <hr class="my-4 border-neutral-200">
+    <p>&copy; 2025 Andrew "Him" Flora. All rights reserved.</p>
+</footer>
+
 </body>
 </html>
-
-
