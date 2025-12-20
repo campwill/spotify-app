@@ -2,6 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-.form-input {
-  @apply px-6 py-3 border-4 border-red-500 rounded-lg bg-yellow-200 text-red-700 font-bold;
+@layer components {
+  /* Page Container */
+  .page-container {
+    @apply max-w-6xl mx-auto;
+  }
+
+  /* Page Layout */
+  .page {
+    @apply bg-neutral-50 text-neutral-800 px-6 py-10 w-full;
+  }
+
+  /* Page Header */
+  .page-eyebrow {
+    @apply text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-1;
+  }
+
+  .page-title {
+    @apply text-2xl font-medium tracking-wide;
+  }
+
+  /* Filters */
+  .filter-form {
+    @apply mb-10;
+  }
+
+  .filter-bar {
+    @apply flex flex-wrap gap-6 items-end border-b border-neutral-200 pb-4
+           hover:border-[#1DB954] transition-colors duration-500;
+  }
+
+  .filter-label {
+    @apply block text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-1;
+  }
+
+  .filter-select {
+    @apply bg-transparent text-sm tracking-wide focus:outline-none cursor-pointer;
+  }
+
+  /* List Rows */
+  .list {
+    @apply space-y-2;
+  }
+
+  .list-row {
+    @apply flex items-center gap-4 p-3 rounded-lg cursor-pointer
+           hover:bg-neutral-100 transition-colors duration-300;
+  }
+
+  .list-rank {
+    @apply w-6 text-right text-sm text-neutral-400;
+  }
+
+  .list-image {
+    @apply w-14 h-14 flex-shrink-0;
+  }
+
+  .list-title {
+    @apply text-sm font-medium tracking-wide;
+  }
+
+  .list-subtitle {
+    @apply text-xs text-neutral-500 mt-0.5;
+  }
+
+  .list-hint {
+    @apply text-xs text-neutral-400 tracking-wide;
+  }
 }

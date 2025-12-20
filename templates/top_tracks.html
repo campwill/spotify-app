@@ -1,12 +1,73 @@
 {% extends "base.html" %}
-
 {% block title %}Top Tracks{% endblock %}
 
 {% block content %}
-<h1>Your Top Tracks</h1>
-<ul>
-  {% for track in tracks %}
-    <li>{{ track['name'] }} by {{ track['artists'][0]['name'] }}</li>
-  {% endfor %}
-</ul>
+<div class="page">
+  <div class="page-container mb-8">
+    <div class="page-eyebrow">Spotify Stats</div>
+    <h1 class="page-title">Your Top Tracks</h1>
+  </div>
+
+  <form method="get" action="/top-tracks" class="page-container filter-form">
+    <div class="filter-bar">
+      <div>
+        <label class="filter-label">Time Range</label>
+        <select name="time_range" onchange="this.form.submit()" class="filter-select">
+          <option value="short_term" {% if time_range == "short_term" %}selected{% endif %}>Last 4 weeks</option>
+          <option value="medium_term" {% if time_range == "medium_term" %}selected{% endif %}>Last 6 months</option>
+          <option value="long_term" {% if time_range == "long_term" %}selected{% endif %}>All time</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="filter-label">Show</label>
+        <select name="limit" onchange="this.form.submit()" class="filter-select">
+          <option value="10" {% if limit == 10 %}selected{% endif %}>10</option>
+          <option value="25" {% if limit == 25 %}selected{% endif %}>25</option>
+          <option value="50" {% if limit == 50 %}selected{% endif %}>50</option>
+        </select>
+      </div>
+
+      <!-- BUTTON FOR GENERATING PLAYLIST
+      <div class="ml-auto">
+        <button type="button" onclick="" class=""> Generate Playlist</button>
+      </div>
+      -->
+
+    </div>
+  </form>
+
+
+
+  <div class="page-container list">
+    {% for track in tracks %}
+    <a href="{{ track.external_urls.spotify }}" target="_blank" rel="noopener noreferrer" class="block">
+      <div class="list-row">
+
+        <div class="list-rank">{{ loop.index }}</div>
+
+        <div class="list-image">
+          {% if track.album.images %}
+            <div class="w-14 h-14 rounded overflow-hidden bg-neutral-200">
+              <img src="{{ track.album.images[0].url }}" alt="{{ track.name }}" class="w-full h-full object-cover scale-110" />
+            </div>
+          {% else %}
+            <div class="w-14 h-14 rounded bg-neutral-300"></div>
+          {% endif %}
+        </div>
+
+        <div class="flex-grow">
+          <div class="list-title">{{ track.name }}</div>
+          <div class="list-subtitle">{{ track.artists | map(attribute='name') | join(', ') }} · {{ track.album.release_date[:4] }}</div>
+        </div>
+
+        <div class="list-hint tabular-nums">
+          {{ (track.duration_ms // 60000) }}:{{ '%02d' % ((track.duration_ms // 1000) % 60) }}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+</div>
 {% endblock %}

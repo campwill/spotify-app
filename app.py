@@ -5,7 +5,6 @@ from urllib.parse import urlencode
 from dotenv import load_dotenv
 #import db
 
-
 load_dotenv()
 
 app = Flask(__name__)
@@ -81,44 +80,84 @@ def top_tracks():
     token = session.get('access_token')
     if not token:
         return redirect('/')
+
+    time_range = request.args.get("time_range", "medium_term")
+    limit = int(request.args.get("limit", 25))  # convert to int
+
     headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(f"{SPOTIFY_API_BASE_URL}/me/top/tracks?limit=10", headers=headers)
-    
+    response = requests.get(
+        f"{SPOTIFY_API_BASE_URL}/me/top/tracks",
+        headers=headers,
+        params={
+            "limit": limit,
+            "time_range": time_range
+        }
+    )
+
     if response.status_code != 200:
-        return f"Error {response.status_code}: {response.text}", response.status_code
-    try:
-        data = response.json()
-    except ValueError:
-        return f"Invalid response from Spotify: {response.text}"
+        return f"Error {response.status_code}: {response.text}"
 
-    if not data or not data.get("items"):
-        return "No tracks found."
+    data = response.json()
+    tracks = data.get("items", [])
 
-    return render_template("top_tracks.html", tracks=data['items'])
+    return render_template("top_tracks.html", tracks=tracks, time_range=time_range, limit=limit)
 
 @app.route('/top-artists')
 def top_artists():
     token = session.get('access_token')
     if not token:
         return redirect('/')
+
+    time_range = request.args.get("time_range", "medium_term")
+    limit = int(request.args.get("limit", 25))
+
     headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(f"{SPOTIFY_API_BASE_URL}/me/top/artists?limit=10", headers=headers)
+    response = requests.get(
+        f"{SPOTIFY_API_BASE_URL}/me/top/artists",
+        headers=headers,
+        params={
+            "time_range": time_range,
+            "limit": limit
+        }
+    )
+
+    if response.status_code != 200:
+        return response.text, response.status_code
+
     data = response.json()
-    return render_template("top_artists.html", artists=data['items'])
+    artists = data.get("items", [])
+
+    return render_template("top_artists.html", artists=artists, time_range=time_range, limit=limit)
 
 @app.route('/recently-played')
 def recently_played():
     token = session.get('access_token')
     if not token:
         return redirect('/')
+
+    limit = int(request.args.get("limit", 25))
+
     headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(f"{SPOTIFY_API_BASE_URL}/me/player/recently-played?limit=50", headers=headers)
+    response = requests.get(
+        f"{SPOTIFY_API_BASE_URL}/me/player/recently-played",
+        headers=headers,
+        params={
+            "limit": limit
+        }
+    )
+
+    if response.status_code != 200:
+        return f"Error {response.status_code}: {response.text}"
+
     data = response.json()
-    return render_template("recently_played.html", tracks=data['items'])
+    tracks = data.get("items", [])
+
+    return render_template("recently_played.html", tracks=tracks, limit=limit)
 
 @app.route('/album-search')
 def album_search():
     return render_template("album_search.html")
+
 @app.route('/album-results')
 def album_results():
     album_name = request.args.get("album")
@@ -132,13 +171,18 @@ def album_results():
     response = requests.get(
         f"{SPOTIFY_API_BASE_URL}/search",
         headers=headers,
-        params={"q": album_name, "type": "album", "limit": 10}
+        params={
+            "q": album_name, 
+            "type": "album", 
+            "limit": 10
+        }
     )
 
     data = response.json()
     albums = data.get("albums", {}).get("items", [])
 
     return render_template("album_results.html", albums=albums)
+
 @app.route('/album-tournament/<album_id>')
 def album_tournament(album_id):
     token = session.get('access_token')
@@ -149,7 +193,6 @@ def album_tournament(album_id):
     tracks = response.json().get("items", [])
 
     return render_template("album_tournament.html", tracks=tracks)
-
 
 @app.route('/logout')
 def logout():

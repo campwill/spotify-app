@@ -1,12 +1,60 @@
 {% extends "base.html" %}
-
 {% block title %}Top Artists{% endblock %}
 
 {% block content %}
-<h1>Your Top Artists</h1>
-<ul>
-  {% for artist in artists %}
-      <li>{{ artist['name'] }}</li>
-  {% endfor %}
-</ul>
+<div class="page">
+  <div class="page-container mb-8">
+    <div class="page-eyebrow">Spotify Stats</div>
+    <h1 class="page-title">Your Top Artists</h1>
+  </div>
+
+  <form method="get" action="/top-artists" class="page-container filter-form">
+    <div class="filter-bar">
+      <div>
+        <label class="filter-label">Time Range</label>
+        <select name="time_range" onchange="this.form.submit()" class="filter-select">
+          <option value="short_term" {% if time_range == "short_term" %}selected{% endif %}>Last 4 weeks</option>
+          <option value="medium_term" {% if time_range == "medium_term" %}selected{% endif %}>Last 6 months</option>
+          <option value="long_term" {% if time_range == "long_term" %}selected{% endif %}>All time</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="filter-label">Show</label>
+        <select name="limit" onchange="this.form.submit()" class="filter-select">
+          <option value="10" {% if limit == 10 %}selected{% endif %}>10</option>
+          <option value="25" {% if limit == 25 %}selected{% endif %}>25</option>
+          <option value="50" {% if limit == 50 %}selected{% endif %}>50</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <div class="page-container list">
+    {% for artist in artists %}
+    <a href="{{ artist.external_urls.spotify }}" target="_blank" rel="noopener noreferrer" class="block">
+      <div class="list-row">
+
+        <div class="list-rank">{{ loop.index }}</div>
+
+        <div class="list-image">
+          {% if artist.images %}
+            <img src="{{ artist.images[0].url }}" alt="{{ artist.name }}" class="w-14 h-14 rounded-full object-cover" />
+          {% else %}
+            <div class="w-14 h-14 rounded-full bg-neutral-300"></div>
+          {% endif %}
+        </div>
+
+        <div class="flex-grow">
+          <div class="list-title">{{ artist.name }}</div>
+          <div class="list-subtitle">{{ artist.genres[:3] | join(", ") }}</div>
+        </div>
+
+        <div class="list-hint">Open in Spotify →</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+</div>
 {% endblock %}

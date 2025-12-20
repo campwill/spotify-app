@@ -1,25 +1,64 @@
 {% extends "base.html" %}
-
 {% block title %}Recently Played{% endblock %}
 
 {% block content %}
-<h1>Your Recently Played Tracks</h1>
-<table>
-  <thead>
-    <tr>
-      <th>Track Name</th>
-      <th>Artist</th>
-      <th>Played At</th>
-    </tr>
-  </thead>
-  <tbody>
+<div class="page">
+
+  <!-- Header -->
+  <div class="page-container mb-8">
+    <div class="page-eyebrow">Spotify Stats</div>
+    <h1 class="page-title">Your Recently Played Tracks</h1>
+  </div>
+
+  <form method="get" action="/recently-played" class="page-container filter-form">
+    <div class="filter-bar">
+      <div>
+        <label class="filter-label">Show</label>
+        <select name="limit" onchange="this.form.submit()" class="filter-select">
+          <option value="10" {% if limit == 10 %}selected{% endif %}>10</option>
+          <option value="25" {% if limit == 25 %}selected{% endif %}>25</option>
+          <option value="50" {% if limit == 50 %}selected{% endif %}>50</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <!-- Track List -->
+  <div class="page-container list">
     {% for item in tracks %}
-    <tr>
-      <td>{{ item['track']['name'] }}</td>
-      <td>{{ item['track']['artists'][0]['name'] }}</td>
-      <td>{{ item['played_at'] }}</td>
-    </tr>
+    {% set track = item['track'] %}
+    <a href="{{ track.external_urls.spotify }}" target="_blank" rel="noopener noreferrer" class="block">
+      <div class="list-row">
+
+        <!-- Rank -->
+        <div class="list-rank">{{ loop.index }}</div>
+
+        <!-- Album Art -->
+        <div class="list-image">
+          {% if track.album.images %}
+            <div class="w-14 h-14 rounded overflow-hidden bg-neutral-200">
+              <img src="{{ track.album.images[0].url }}" alt="{{ track.name }}" class="w-full h-full object-cover scale-110" />
+            </div>
+          {% else %}
+            <div class="w-14 h-14 rounded bg-neutral-300"></div>
+          {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="flex-grow min-w-0">
+          <div class="list-title truncate">{{ track.name }}</div>
+          <div class="list-subtitle truncate">{{ track.artists | map(attribute='name') | join(', ') }}</div>
+        </div>
+
+        <!-- Duration -->
+        <div class="list-hint tabular-nums">
+          Played on {{ item['played_at'] | replace("T"," at ") | replace("Z","") }}
+        </div>
+
+      </div>
+    </a>
     {% endfor %}
-  </tbody>
-</table>
+  </div>
+
+</div>
 {% endblock %}
