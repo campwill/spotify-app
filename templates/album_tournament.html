@@ -2,19 +2,67 @@
 {% block title %}Album Tournament{% endblock %}
 
 {% block content %}
-<h1>Track Tournament</h1>
+<div class="flex justify-center bg-neutral-50 text-neutral-800 px-4 py-12 w-full">
+  <div class="w-full max-w-3xl">
 
-<div id="match-container">
-  <p id="match-text"></p>
-  <button id="track1-btn"></button>
-  <button id="track2-btn"></button>
+    <div class="mb-8">
+      <div class="text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-2">
+        Track Tournament
+      </div>
+      <h1 class="text-xl font-medium tracking-wide">
+        Choose Your Favorite
+      </h1>
+    </div>
+
+    <div id="match-container" class="mb-12">
+        <p id="match-text" class="mb-6 text-sm text-neutral-600">
+            Which track do you prefer?
+        </p>
+
+        <div class="grid grid-cols-2 gap-6">
+            <button
+            id="track1-btn"
+            class="aspect-square flex items-center justify-center
+                    text-center px-6
+                    border border-neutral-200 rounded-lg
+                    text-base font-medium
+                    hover:border-[#1DB954] hover:text-[#1DB954]
+                    transition-colors duration-300"
+            ></button>
+
+            <button
+            id="track2-btn"
+            class="aspect-square flex items-center justify-center
+                    text-center px-6
+                    border border-neutral-200 rounded-lg
+                    text-base font-medium
+                    hover:border-[#1DB954] hover:text-[#1DB954]
+                    transition-colors duration-300"
+            ></button>
+        </div>
+    </div>
+
+    <div class="mb-10">
+      <div id="score-title"
+           class="text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-3">
+        Current Scores
+      </div>
+
+      <ul id="score-list" class="space-y-1 text-sm text-neutral-600"></ul>
+    </div>
+
+    <div>
+      <div id="final-ranking"
+           class="hidden text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-3">
+        Final Ranking
+      </div>
+
+      <ol id="ranking-list"
+          class="space-y-1 text-sm text-neutral-700 list-decimal list-inside"></ol>
+    </div>
+
+  </div>
 </div>
-
-<h2 id="score-title">Current Scores</h2>
-<ul id="score-list"></ul>
-
-<h2 id="final-ranking" style="display:none;">Final Ranking</h2>
-<ol id="ranking-list"></ol>
 
 <script>
   // create matches
@@ -78,7 +126,7 @@ function chooseWinner(trackId) {
     showNextMatch();
 }
 
-// Update the display so the final rankings are shown
+// Update the display so the final rankings are shown need to fix
 function showFinalRanking() {
     document.getElementById("match-container").style.display = "none";
 
