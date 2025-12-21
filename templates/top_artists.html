@@ -8,8 +8,8 @@
     <h1 class="page-title">Your Top Artists</h1>
   </div>
 
-  <form method="get" action="/top-artists" class="page-container filter-form">
-    <div class="filter-bar">
+  <div class="page-container filter-form border-b border-neutral-200 pb-6 flex flex-wrap items-end gap-4">
+    <form method="get" action="/top-artists" class="flex gap-4 flex-wrap items-end">
       <div>
         <label class="filter-label">Time Range</label>
         <select name="time_range" onchange="this.form.submit()" class="filter-select">
@@ -18,7 +18,6 @@
           <option value="long_term" {% if time_range == "long_term" %}selected{% endif %}>All time</option>
         </select>
       </div>
-
       <div>
         <label class="filter-label">Show</label>
         <select name="limit" onchange="this.form.submit()" class="filter-select">
@@ -27,8 +26,8 @@
           <option value="50" {% if limit == 50 %}selected{% endif %}>50</option>
         </select>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 
   <div class="page-container list">
     {% for artist in artists %}

@@ -3,12 +3,93 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h2>Welcome to Your Spotify Dashboard</h2>
+<div class="page-container px-4 py-8">
 
-<ul>
-  <li><a href="/top-tracks">Top Tracks</a></li>
-  <li><a href="/top-artists">Top Artists</a></li>
-  <li><a href="/recently-played">Recently Played</a></li>
-  <li><a href="/logout">Logout</a></li>
-</ul>
+  <h2 class="page-title mb-8">Welcome to Your Spotify Dashboard</h2>
+
+  <p class="text-sm text-neutral-500 mb-6">
+    View your top tracks, artists, genres, recently played songs, and rank your favorite songs.
+  </p>
+
+  <div class="flex flex-col lg:flex-row gap-8">
+
+    <section class="flex-1">
+      <h3 class="text-lg font-medium mb-4">
+        <a href="/top-artists" class="text-lg font-medium text-neutral-800 hover:text-[#1DB954] transition-colors duration-300">
+          Top Artists →
+        </a>
+      </h3>
+      <div class="list">
+        {% for artist in top_artists %}
+        <div class="list-row">
+          <div class="list-rank">{{ loop.index }}</div>
+          <div class="list-image">
+            <img 
+              src="{{ artist.images[0].url }}"
+              alt="{{ artist.name }}"
+              class="w-full h-full rounded-full object-cover" />
+          </div>
+          <div>
+            <div class="list-title">{{ artist.name }}</div>
+            <div class="list-subtitle">{{ artist.genres[:3] | join(", ") }}</div>
+          </div>
+        </div>        
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="flex-1">
+      <h3 class="text-lg font-medium mb-4">
+        <a href="/top-tracks" class="text-lg font-medium text-neutral-800 hover:text-[#1DB954] transition-colors duration-300">
+          Top Tracks →
+        </a>
+      </h3>
+      <div class="list">
+        {% for track in top_tracks %}
+        <div class="list-row">
+          <div class="list-rank">{{ loop.index }}</div>
+          <div class="list-image">
+            <img 
+              src="{{ track.album.images[0].url }}" 
+              alt="{{ track.name }}" 
+              class="w-full h-full object-cover rounded"
+            />
+          </div>
+          <div>
+            <div class="list-title">{{ track.name }}</div>
+            <div class="list-subtitle">{{ track.artists[0].name }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="flex-1">
+      <h3 class="text-lg font-medium mb-4">
+        <a href="/recently-played" class="text-lg font-medium text-neutral-800 hover:text-[#1DB954] transition-colors duration-300">
+          Recently Played →
+        </a>
+      </h3>
+      <div class="list">
+        {% for track in recently_played %}
+        <div class="list-row">
+          <div class="list-rank">{{ loop.index }}</div>
+          <div class="list-image">
+            <img 
+              src="{{ track.album.images[0].url if track.album.images else '/static/src/img/album-placeholder.svg' }}" 
+              alt="{{ track.name }}" 
+              class="w-full h-full object-cover rounded"
+            />
+          </div>
+          <div>
+            <div class="list-title">{{ track.name }}</div>
+            <div class="list-subtitle">{{ track.artists[0].name }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+</div>
 {% endblock %}

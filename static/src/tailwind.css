@@ -86,7 +86,7 @@
   }
 
   /* CTA matches dashboard action */
-  .button {
+  .login-button {
     @apply text-sm tracking-wide font-medium
            text-[#1DB954]
            hover:underline underline-offset-4
