@@ -1,8 +1,72 @@
 <!DOCTYPE html>
-<html>
-  <head><title>Spotify Login</title></head>
-<body>
-  <h1>Welcome to Spotify Stats</h1>
-  <a href="{{ auth_url }}">Login with Spotify</a>
+<html lang="en">
+<head>
+  <title>Spotify Stats</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
+</head>
+
+<body class="bg-neutral-50 text-neutral-800">
+  <div class="page min-h-screen flex items-center justify-center">
+
+    <!-- Login Card -->
+    <div class="login-card">
+
+      <!-- Header -->
+      <div class="page-eyebrow mb-3">
+        Spotify Dashboard
+      </div>
+      <h1 class="page-title mb-6">
+        Sign in to explore your music
+      </h1>
+
+      <p class="text-sm text-neutral-500 mb-6">
+        Connect your Spotify account to view your top tracks, artists, genres, recently played songs, and tracklist rankings.
+      </p>
+
+      <!-- Connect Button -->
+      <div class="mb-8">
+        <a href="{{ auth_url }}" class="button">
+          Login with Spotify →
+        </a>
+      </div>
+
+      <!-- Features Preview -->
+      <div class="grid grid-cols-2 gap-4">
+
+        <div class="bg-neutral-50 p-4 rounded-lg text-center flex flex-col items-center gap-2">
+          <img src="static/src/img/music-note-beamed.svg" class="w-6 h-6" />
+          <div class="font-medium text-neutral-800 mb-1">Top Songs</div>
+          <div class="text-xs text-neutral-500">Your most-played tracks</div>
+        </div>
+
+        <div class="bg-neutral-50 p-4 rounded-lg text-center flex flex-col items-center gap-2">
+          <img src="static/src/img/person-fill.svg" class="w-6 h-6" />
+          <div class="font-medium text-neutral-800">Top Artists</div>
+          <div class="text-xs text-neutral-500">Your favorite musicians</div>
+        </div>
+
+        <div class="bg-neutral-50 p-4 rounded-lg text-center flex flex-col items-center gap-2">
+          <img src="static/src/img/headphones.svg" class="w-6 h-6" />          
+          <div class="font-medium text-neutral-800 mb-1">Top Genres</div>
+          <div class="text-xs text-neutral-500">Discover your music tastes</div>
+        </div>
+
+        <div class="bg-neutral-50 p-4 rounded-lg text-center flex flex-col items-center gap-2">
+          <img src="static/src/img/music-note-list.svg" class="w-6 h-6" />
+          <div class="font-medium text-neutral-800 mb-1">Recently Played</div>
+          <div class="text-xs text-neutral-500">Quickly access recent tracks</div>
+        </div>
+
+        <div class="col-span-2 bg-neutral-50 p-4 rounded-lg text-center flex flex-col items-center gap-2">
+          <div class="font-medium text-neutral-800 mb-1">Tracklist Rankers</div>
+          <div class="text-xs text-neutral-500">Rank your tracks and playlists</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
 </body>
 </html>

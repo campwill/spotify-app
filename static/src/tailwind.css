@@ -69,4 +69,28 @@
   .list-hint {
     @apply text-xs text-neutral-400 tracking-wide;
   }
+
+  /* Login card: subtle elevation */
+  .login-card {
+    @apply bg-white rounded-lg px-10 py-12 w-full max-w-xl;
+
+    box-shadow:
+      0 1px 0 rgba(0,0,0,0.04),
+      0 12px 24px rgba(0,0,0,0.06);
+  }
+
+  /* Divider behaves like filter bar */
+  .login-divider {
+    @apply flex items-end justify-between
+           border-b border-neutral-200 pb-6;
+  }
+
+  /* CTA matches dashboard action */
+  .button {
+    @apply text-sm tracking-wide font-medium
+           text-[#1DB954]
+           hover:underline underline-offset-4
+           transition;
+  }
+
 }
