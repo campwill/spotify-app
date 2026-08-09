@@ -3,93 +3,144 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="page-container px-4 py-8">
-
-  <h2 class="page-title mb-8">Welcome to Your Spotify Dashboard</h2>
-
-  <p class="text-sm text-neutral-500 mb-6">
-    View your top tracks, artists, genres, recently played songs, and rank your favorite songs.
-  </p>
-
-  <div class="flex flex-col lg:flex-row gap-8">
-
-    <section class="flex-1">
-      <h3 class="text-lg font-medium mb-4">
-        <a href="/top-artists" class="text-lg font-medium text-neutral-800 hover:text-[#1DB954] transition-colors duration-300">
-          Top Artists →
-        </a>
-      </h3>
-      <div class="list">
-        {% for artist in top_artists %}
-        <div class="list-row">
-          <div class="list-rank">{{ loop.index }}</div>
-          <div class="list-image">
-            <img 
-              src="{{ artist.images[0].url }}"
-              alt="{{ artist.name }}"
-              class="w-full h-full rounded-full object-cover" />
-          </div>
-          <div>
-            <div class="list-title">{{ artist.name }}</div>
-            <div class="list-subtitle">{{ artist.genres[:3] | join(", ") }}</div>
-          </div>
-        </div>        
-        {% endfor %}
-      </div>
-    </section>
-
-    <section class="flex-1">
-      <h3 class="text-lg font-medium mb-4">
-        <a href="/top-tracks" class="text-lg font-medium text-neutral-800 hover:text-[#1DB954] transition-colors duration-300">
-          Top Tracks →
-        </a>
-      </h3>
-      <div class="list">
-        {% for track in top_tracks %}
-        <div class="list-row">
-          <div class="list-rank">{{ loop.index }}</div>
-          <div class="list-image">
-            <img 
-              src="{{ track.album.images[0].url }}" 
-              alt="{{ track.name }}" 
-              class="w-full h-full object-cover rounded"
-            />
-          </div>
-          <div>
-            <div class="list-title">{{ track.name }}</div>
-            <div class="list-subtitle">{{ track.artists[0].name }}</div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-
-    <section class="flex-1">
-      <h3 class="text-lg font-medium mb-4">
-        <a href="/recently-played" class="text-lg font-medium text-neutral-800 hover:text-[#1DB954] transition-colors duration-300">
-          Recently Played →
-        </a>
-      </h3>
-      <div class="list">
-        {% for track in recently_played %}
-        <div class="list-row">
-          <div class="list-rank">{{ loop.index }}</div>
-          <div class="list-image">
-            <img 
-              src="{{ track.album.images[0].url if track.album.images else '/static/src/img/album-placeholder.svg' }}" 
-              alt="{{ track.name }}" 
-              class="w-full h-full object-cover rounded"
-            />
-          </div>
-          <div>
-            <div class="list-title">{{ track.name }}</div>
-            <div class="list-subtitle">{{ track.artists[0].name }}</div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-
+<div class="max-w-6xl mx-auto px-6 py-10 text-neutral-900">
+  <div class="mb-10">
+    <p class="text-[10px] tracking-[0.35em] uppercase text-neutral-500 mb-2">
+      Overview
+    </p>
+    <h2 class="text-2xl font-semibold">
+      Your Spotify Dashboard
+    </h2>
   </div>
-</div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <a href="/top-artists" class="md:col-span-2 bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-neutral-600">Top Artists</h3>
+        <span class="text-xs text-neutral-400">Top 3</span>
+      </div>
+
+      <div class="space-y-4">
+        {% for artist in top_artists %}
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 flex-shrink-0">
+            {% if artist.images %}
+              <img src="{{ artist.images[0].url }}" class="w-14 h-14 rounded-full object-cover" alt="{{ artist.name }}">
+            {% else %}
+              <div class="w-14 h-14 rounded-full bg-neutral-300"></div>
+            {% endif %}
+          </div>
+          <div>
+            <p class="font-medium leading-tight">{{ artist.name }}</p>
+            <p class="text-xs text-neutral-500">#{{ loop.index }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </a>
+
+    <div class="flex flex-col gap-6">
+
+      <a href="/top-tracks" class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold uppercase tracking-wide text-neutral-600">Top Tracks</h3>
+          <span class="text-xs text-neutral-400">Top 3</span>
+        </div>
+
+        <div class="space-y-3">
+          {% for track in top_tracks %}
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 flex-shrink-0">
+              {% if track.album.images %}
+                <img src="{{ track.album.images[0].url }}" class="w-10 h-10 rounded-md object-cover" alt="{{ track.name }}">
+              {% else %}
+                <div class="w-10 h-10 rounded-md bg-neutral-300"></div>
+              {% endif %}
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium truncate">{{ track.name }}</p>
+              <p class="text-xs text-neutral-500 truncate">{{ track.artists[0].name }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </a>
+
+<a href="/recently-played"
+   class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition overflow-hidden">
+
+  <div class="flex items-center justify-between mb-3">
+    <h3 class="text-sm font-semibold uppercase tracking-wide text-neutral-600">
+      Recently Played
+    </h3>
+    <span class="text-xs text-neutral-400">Last 25</span>
+  </div>
+
+  <div class="relative h-52 overflow-hidden mask-fade">
+
+    <div class="scroll-track space-y-3">
+
+      {# First pass #}
+      {% for item in recently_played %}
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 flex-shrink-0">
+          {% if item.track.album.images %}
+            <img
+              src="{{ item.track.album.images[0].url }}"
+              class="w-10 h-10 rounded-md object-cover"
+              alt="{{ item.track.name }}"
+            >
+          {% else %}
+            <div class="w-10 h-10 rounded-md bg-neutral-300"></div>
+          {% endif %}
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-sm font-medium truncate">
+            {{ item.track.name }}
+          </p>
+          <p class="text-xs text-neutral-500 truncate">
+            {{ item.track.artists[0].name }}
+          </p>
+        </div>
+      </div>
+      {% endfor %}
+
+      {# Duplicate pass for seamless loop #}
+      {% for item in recently_played %}
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 flex-shrink-0">
+          {% if item.track.album.images %}
+            <img
+              src="{{ item.track.album.images[0].url }}"
+              class="w-10 h-10 rounded-md object-cover"
+              alt="{{ item.track.name }}"
+            >
+          {% else %}
+            <div class="w-10 h-10 rounded-md bg-neutral-300"></div>
+          {% endif %}
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-sm font-medium truncate">
+            {{ item.track.name }}
+          </p>
+          <p class="text-xs text-neutral-500 truncate">
+            {{ item.track.artists[0].name }}
+          </p>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</a>
+
+
+    </div>
+  </div>
+
+
 {% endblock %}
+

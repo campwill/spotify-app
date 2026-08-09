@@ -93,4 +93,43 @@
            transition;
   }
 
+@keyframes vertical-loop {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.scroll-track {
+  will-change: transform;
+  animation: vertical-loop 40s linear infinite;
+}
+
+.scroll-track:hover {
+  animation-play-state: paused;
+}
+
+.mask-fade {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+}
+
+.scroll-track > div {
+  transition: transform 0.2s ease;
+}
+
 }

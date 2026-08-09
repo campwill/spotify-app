@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Album Tournament{% endblock %}
+
+{% block content %}
+{% set ns = namespace(sizes=[], n=tracks|length) %}
+
+{% for _ in range(32) %}
+  {% if ns.n > 1 %}
+    {% set _ = ns.sizes.append(ns.n) %}
+    {% set ns.n = (ns.n + 1) // 2 %}
+  {% endif %}
+{% endfor %}
+{% set _ = ns.sizes.append(1) %}
+
+<style>
+.matchup::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 120%;
+  background: #e5e7eb;
+  border-radius: 2px;
+}
+
+.winner {
+  background-color: #1DB954 !important;
+  color: white !important;
+  border-color: #1DB954 !important;
+}
+
+.loser {
+  opacity: 0.4;
+}
+
+.round li {
+  min-width: 150px;       
+  padding: 0.2rem 0.5rem; 
+  font-size: 0.75rem;     
+  margin: 0.2rem 0;       
+}
+
+.round li span {
+  width: 4px;
+  height: 4px;
+  margin-right: 0.5rem;
+}
+</style>
+
+<div class="px-4 py-12 bg-neutral-50 text-neutral-800">
+
+  <h1 class="text-2xl font-semibold text-center mb-8">
+    March Madness Bracket
+  </h1>
+
+  <div class="flex mr-3 mt-16" id="bracket-container">
+
+    {% for size in ns.sizes %}
+    {% set is_first_round = loop.first %}
+    {% set is_last_round = loop.last %}
+
+    <ol
+      class="flex flex-1 flex-col justify-around mx-5 round {% if is_last_round %}round-winner{% endif %}"
+      id="round-{{ loop.index0 }}"
+    >
+      {% for i in range(size) %}
+      <li class="flex items-center bg-white text-gray-900 border border-gray-300 rounded-full relative cursor-pointer transition with-connector">
+        <span class="inline-block bg-gray-300 rounded-full"></span>
+        {% if is_last_round %}
+          Winner
+        {% elif is_first_round %}
+          Placeholder
+        {% else %}
+          TBD
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+    {% endfor %}
+
+  </div>
+</div>
+
+<script>
+const tracks = {{ tracks | tojson }};
+
+function fillRound(roundIndex, competitors) {
+  const round = document.querySelectorAll('.round')[roundIndex];
+  if (!round) return;
+
+  const items = round.querySelectorAll('li');
+
+  for (let i = 0; i < items.length; i++) {
+    if (i < competitors.length) {
+      items[i].lastChild.textContent = competitors[i].name;
+      items[i].dataset.trackId = competitors[i].id;
+      items[i].classList.remove('with-bye');
+    } else {
+      items[i].lastChild.textContent = 'BYE';
+      items[i].removeAttribute('data-track-id');
+      items[i].classList.add('with-bye');
+    }
+  }
+
+  for (let i = 0; i < items.length; i += 2) {
+    items[i]?.classList.add('matchup');
+    items[i + 1]?.classList.add('matchup');
+  }
+}
+
+fillRound(0, tracks);
+
+document.querySelectorAll('.round').forEach((round, roundIndex) => {
+  round.addEventListener('click', e => {
+    const item = e.target.closest('li');
+    if (!item || !item.dataset.trackId) return;
+
+    const items = Array.from(round.children);
+    const index = items.indexOf(item);
+    const base = index - (index % 2);
+    const opponent = items[base === index ? base + 1 : base];
+
+    items[base]?.classList.remove('winner', 'loser');
+    items[base + 1]?.classList.remove('winner', 'loser');
+
+    item.classList.add('winner');
+    opponent?.classList.add('loser');
+
+    const nextRound = document.querySelectorAll('.round')[roundIndex + 1];
+    if (!nextRound) return;
+
+    const nextItem = nextRound.children[Math.floor(index / 2)];
+    if (!nextItem) return;
+
+    nextItem.lastChild.textContent = item.lastChild.textContent;
+    nextItem.dataset.trackId = item.dataset.trackId;
+  });
+});
+</script>
+{% endblock %}

@@ -1,9 +1,9 @@
-from flask import Flask, redirect, request, session, render_template
+from flask import Flask, redirect, request, session, render_template,url_for
 import requests
-import os
+import os, time
 from urllib.parse import urlencode
 from dotenv import load_dotenv
-#import db
+
 
 load_dotenv()
 
@@ -27,6 +27,40 @@ def get_auth_url():
         "scope": SCOPE
     }
     return f"{SPOTIFY_AUTH_URL}?{urlencode(payload)}"
+def refresh_token():
+    refresh = session.get("refresh_token")
+    print("REFRESH TOKEN:", session.get("refresh_token"))
+
+    if not refresh:
+        return None
+
+    response = requests.post(
+        SPOTIFY_TOKEN_URL,
+        data={
+            "grant_type": "refresh_token",
+            "refresh_token": refresh,
+            "client_id": SPOTIFY_CLIENT_ID,
+            "client_secret": SPOTIFY_CLIENT_SECRET,
+        }
+    )
+
+    token_data = response.json()
+
+    session["access_token"] = token_data["access_token"]
+    session["expires_at"] = time.time() + token_data["expires_in"]
+
+    return session["access_token"]
+def get_token():
+    access_token = session.get("access_token")
+    expires_at = session.get("expires_at")
+
+    if not access_token or not expires_at:
+        return None
+
+    if time.time() < expires_at - 60:
+        return access_token
+
+    return refresh_token()
 
 @app.route('/')
 def index():
@@ -48,61 +82,44 @@ def callback():
 
     response = requests.post(SPOTIFY_TOKEN_URL, data=payload)
     response_data = response.json()
+
     access_token = response_data.get("access_token")
     refresh_token = response_data.get("refresh_token")
     expires_in = response_data.get("expires_in")
+
     headers = {"Authorization": f"Bearer {access_token}"}
     user_profile = requests.get(f"{SPOTIFY_API_BASE_URL}/me", headers=headers).json()
 
-    user_id = user_profile["id"]
-    display_name = user_profile.get("display_name")
-    email = user_profile.get("email")
-
-    # Save to DB
-    #db.save_user(user_id, display_name, email, access_token, refresh_token, expires_in)
-
-    # Save to session
-    session['user_id'] = user_id
     session['access_token'] = access_token
+    session['refresh_token'] = refresh_token
+    session['expires_at'] = time.time() + expires_in
 
     return redirect('/dashboard')
 
 @app.route('/dashboard')
 def dashboard():
-    token = session.get('access_token')
+    token = get_token()
+    print(token)
     if not token:
         return redirect('/')
 
     headers = {"Authorization": f"Bearer {token}"}
 
-    artists_resp = requests.get(
-        f"{SPOTIFY_API_BASE_URL}/me/top/artists",
-        headers=headers,
-        params={
-            "limit": 5,
-            "time_range": "long_term"
-        }
-    )
-    top_artists = artists_resp.json().get("items", []) if artists_resp.status_code == 200 else []
+    top_artists = requests.get(
+        f"{SPOTIFY_API_BASE_URL}/me/top/artists?limit=3",
+        headers=headers
+    ).json().get("items", [])
 
-    tracks_resp = requests.get(
-        f"{SPOTIFY_API_BASE_URL}/me/top/tracks",
-        headers=headers,
-        params={
-            "limit": 5,
-            "time_range": "long_term"
-        }
-    )
-    top_tracks = tracks_resp.json().get("items", []) if tracks_resp.status_code == 200 else []
+    top_tracks = requests.get(
+        f"{SPOTIFY_API_BASE_URL}/me/top/tracks?limit=3",
+        headers=headers
+    ).json().get("items", [])
 
-    recently_resp = requests.get(
-        f"{SPOTIFY_API_BASE_URL}/me/player/recently-played",
-        headers=headers,
-        params={
-            "limit": 5
-        }
+    recent_res = requests.get(
+        f"{SPOTIFY_API_BASE_URL}/me/player/recently-played?limit=25",
+        headers=headers
     )
-    recently_played = [item["track"] for item in recently_resp.json().get("items", [])] if recently_resp.status_code == 200 else []
+    recently_played = recent_res.json().get("items", [])
 
     return render_template(
         "dashboard.html",
@@ -110,6 +127,7 @@ def dashboard():
         top_tracks=top_tracks,
         recently_played=recently_played
     )
+
 
 @app.route('/top-tracks')
 def top_tracks():
@@ -263,7 +281,16 @@ def album_tournament(album_id):
     tracks = response.json().get("items", [])
 
     return render_template("album_tournament.html", tracks=tracks)
+@app.route('/album-bracket/<album_id>')
+def album_bracket(album_id):
+    token = session.get('access_token')
+    if not token:
+        return redirect(url_for('album_search'))
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(f"{SPOTIFY_API_BASE_URL}/albums/{album_id}/tracks", headers=headers)
+    tracks = response.json().get("items", [])
 
+    return render_template("album_bracket.html", tracks=tracks)
 @app.route('/logout')
 def logout():
     session.clear()

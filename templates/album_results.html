@@ -57,21 +57,13 @@
                   transition">
           Tournament
         </a>
-        <a href="{{ url_for('album_tournament', album_id=album['id']) }}"
+        <a href="{{ url_for('album_bracket', album_id=album['id']) }}"
            class="px-3 py-1 text-xs rounded-full
                   border border-neutral-300 text-neutral-700
                   hover:border-neutral-900 hover:text-neutral-900
                   transition">
-          Bracket(doesnt work)
+          Bracket
         </a>
-        <a href="{{ url_for('album_tournament', album_id=album['id']) }}"
-           class="px-3 py-1 text-xs rounded-full
-                  border border-neutral-300 text-neutral-700
-                  hover:border-neutral-900 hover:text-neutral-900
-                  transition">
-          Option 3
-        </a>
-
       </div>
     </div>
     {% endfor %}

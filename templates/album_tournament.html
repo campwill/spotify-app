@@ -2,138 +2,279 @@
 {% block title %}Album Tournament{% endblock %}
 
 {% block content %}
+
 <div class="flex justify-center bg-neutral-50 text-neutral-800 px-4 py-12 w-full">
   <div class="w-full max-w-3xl">
 
-    <div class="mb-8">
+    <div class="mb-8" id="tournament-header">
       <div class="text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-2">
         Track Tournament
       </div>
+
       <h1 class="text-xl font-medium tracking-wide">
         Choose Your Favorite
       </h1>
     </div>
-
     <div id="match-container" class="mb-12">
-        <p id="match-text" class="mb-6 text-sm text-neutral-600">
-            Which track do you prefer?
-        </p>
 
-        <div class="grid grid-cols-2 gap-6">
-            <button
-            id="track1-btn"
-            class="aspect-square flex items-center justify-center
-                    text-center px-6
-                    border border-neutral-200 rounded-lg
-                    text-base font-medium
-                    hover:border-[#1DB954] hover:text-[#1DB954]
-                    transition-colors duration-300"
-            ></button>
+      <p id="match-text" class="mb-6 text-sm text-neutral-600">
+        Which track do you prefer?
+      </p>
 
-            <button
-            id="track2-btn"
-            class="aspect-square flex items-center justify-center
-                    text-center px-6
-                    border border-neutral-200 rounded-lg
-                    text-base font-medium
-                    hover:border-[#1DB954] hover:text-[#1DB954]
-                    transition-colors duration-300"
-            ></button>
-        </div>
+      <div class="grid grid-cols-2 gap-6">
+        <!-- Should maybe consider fixing this -->
+        <button
+          id="track1-btn"
+          class="aspect-square flex items-center justify-center
+                 text-center px-6
+                 border border-neutral-200 rounded-lg
+                 text-base font-medium
+                 hover:border-[#1DB954] hover:text-[#1DB954]
+                 transition-colors duration-300"
+        ></button>
+
+        <button
+          id="track2-btn"
+          class="aspect-square flex items-center justify-center
+                 text-center px-6
+                 border border-neutral-200 rounded-lg
+                 text-base font-medium
+                 hover:border-[#1DB954] hover:text-[#1DB954]
+                 transition-colors duration-300"
+        ></button>
+      </div>
     </div>
-
     <div class="mb-10">
-      <div id="score-title"
-           class="text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-3">
-        Current Scores
-      </div>
+      <div
+        id="score-title"
+        class="text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-3">Current Scores</div>
 
-      <ul id="score-list" class="space-y-1 text-sm text-neutral-600"></ul>
+      <ul
+        id="score-list"
+        class="space-y-1 text-sm text-neutral-600"
+      ></ul>
+
     </div>
-
     <div>
-      <div id="final-ranking"
-           class="hidden text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-3">
-        Final Ranking
-      </div>
+    <!--looks buns, should edit this-->
+      <div
+        id="final-ranking"
+        class="hidden text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-3">Final Ranking</div>
+      <ol
+        id="ranking-list"
+        class="space-y-1 text-sm text-neutral-700 list-decimal list-inside"
+      ></ol>
 
-      <ol id="ranking-list"
-          class="space-y-1 text-sm text-neutral-700 list-decimal list-inside"></ol>
     </div>
+    <!-- EMBEDS GO HERE THEY ARE HIDDEN-->
+    <div
+      id="spotify-players"
+      class="hidden"
+    ></div>
 
   </div>
 </div>
 
-<script>
-  // create matches
-  // shuffle matches
-  // show current match
-  // update rankings
-  // jmp 3 til all matches are done
-const tracks = {{ tracks | tojson }};
 
+<script>
+
+const tracks = {{ tracks | tojson }};
 let scores = {};
-tracks.forEach(t => scores[t.id] = 0);
+tracks.forEach(track => {
+    scores[track.id] = 0;
+});
 
 let matches = [];
 for (let i = 0; i < tracks.length; i++) {
     for (let j = i + 1; j < tracks.length; j++) {
-        matches.push([tracks[i], tracks[j]]);
+        matches.push([
+            tracks[i],
+            tracks[j]
+        ]);
     }
 }
-//rondomizes the matches
+
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+        const j =
+            Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] =
+            [array[j], array[i]];
     }
 }
 shuffle(matches);
 
 let currentIndex = 0;
-
-function updateScores() {
-    const scoreList = document.getElementById("score-list");
-    scoreList.innerHTML = "";
-
-    const sorted = [...tracks].sort((a,b) => scores[b.id] - scores[a.id]);
-    sorted.forEach(track => {
-        const ol = document.createElement("ol");
-        ol.textContent = `${track.name} – Score: ${scores[track.id]}`;
-        scoreList.appendChild(ol);
+const spotifyPlayers = {};
+let currentlyPlaying = null;
+function createSpotifyEmbeds() {
+    const container =
+        document.getElementById("spotify-players");
+    tracks.forEach(track => {
+        const iframe =
+            document.createElement("iframe");
+        iframe.src =
+            `https://open.spotify.com/embed/track/${track.id}?utm_source=generator&theme=0`;
+        iframe.width = "100%";
+        iframe.height = "80";
+        iframe.frameBorder = "0";
+        iframe.allow =
+            "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+        container.appendChild(iframe);
+        spotifyPlayers[track.id] = iframe;
     });
 }
 
+function toggleTrack(trackId) {
+    const iframe =
+        spotifyPlayers[trackId];
+    if (!iframe) {
+        return;
+    }
+    if (currentlyPlaying === trackId) {
+        iframe.contentWindow.postMessage(
+            {command: "pause"},
+            "https://open.spotify.com"
+        );
+        currentlyPlaying = null;
+        updateScores();
+        return;
+    }
+
+    if (currentlyPlaying !== null) {
+        const previousIframe =
+            spotifyPlayers[currentlyPlaying];
+        if (previousIframe) {
+            previousIframe.contentWindow.postMessage(
+                {command: "pause"},
+                "https://open.spotify.com"
+            );
+        }
+    }
+    iframe.contentWindow.postMessage(
+        {
+            command: "play"
+        },
+        "https://open.spotify.com"
+    );
+    currentlyPlaying = trackId;
+    updateScores();
+}
+
+function updateScores() {
+    const scoreList =
+        document.getElementById("score-list");
+    scoreList.innerHTML = "";
+    const sorted =
+        [...tracks].sort(
+            (a, b) =>
+                scores[b.id] - scores[a.id]
+        );
+    sorted.forEach(track => {
+        const item =
+            document.createElement("li");
+        const button =
+            document.createElement("button");
+        button.textContent =
+            `${track.name} – Score: ${scores[track.id]}`;
+        if (currentlyPlaying === track.id) {
+            button.className =
+                "text-left text-[#1DB954] " +
+                "font-medium " +
+                "transition-colors duration-200 " +
+                "cursor-pointer";
+
+        } else {
+            button.className =
+                "text-left text-neutral-600 " +
+                "hover:text-[#1DB954] " +
+                "transition-colors duration-200 " +
+                "cursor-pointer";
+
+        }
+        button.onclick = () => {
+            toggleTrack(track.id);
+        };
+        item.appendChild(button);
+        scoreList.appendChild(item);
+    });
+}
 function showNextMatch() {
     if (currentIndex >= matches.length) {
         showFinalRanking();
         return;
     }
-    const [t1, t2] = matches[currentIndex];
-
-    document.getElementById("match-text").textContent = "Which track do you prefer?";
-    document.getElementById("track1-btn").textContent = t1.name;
-    document.getElementById("track2-btn").textContent = t2.name;
-
-    document.getElementById("track1-btn").onclick = () => chooseWinner(t1.id);
-    document.getElementById("track2-btn").onclick = () => chooseWinner(t2.id);
+    const [t1, t2] =
+        matches[currentIndex];
+    const btn1 =
+        document.getElementById("track1-btn");
+    const btn2 =
+        document.getElementById("track2-btn");
+    btn1.textContent =
+        t1.name;
+    btn2.textContent =
+        t2.name;
+    btn1.onclick = () => {
+        chooseWinner(t1.id);
+    };
+    btn2.onclick = () => {
+        chooseWinner(t2.id);
+    };
 }
-
 function chooseWinner(trackId) {
+    if (currentlyPlaying !== null) {
+        const iframe =
+            spotifyPlayers[currentlyPlaying];
+        if (iframe) {
+            iframe.contentWindow.postMessage(
+                {command: "pause"},
+                "https://open.spotify.com"
+            );
+        }
+        currentlyPlaying = null;
+    }
     scores[trackId]++;
-    updateScores();
     currentIndex++;
+    updateScores();
     showNextMatch();
 }
 
-// Update the display so the final rankings are shown need to fix
 function showFinalRanking() {
-    document.getElementById("match-container").style.display = "none";
+    document
+        .getElementById("tournament-header")
+        .classList.add("hidden");
 
-    document.getElementById("score-title").textContent = "Final Ranking";
-
+    document
+        .getElementById("match-container")
+        .classList.add("hidden");
+    document
+        .getElementById("score-title")
+        .classList.add("hidden");
+    document
+        .getElementById("score-list")
+        .classList.add("hidden");
+        
+    const finalTitle =
+        document.getElementById("final-ranking");
+    finalTitle.classList.remove("hidden");
+    const rankingList =
+        document.getElementById("ranking-list");
+    rankingList.innerHTML = "";
+    const sorted =
+        [...tracks].sort(
+            (a, b) =>
+                scores[b.id] - scores[a.id]
+        );
+    sorted.forEach(track => {
+        const item =
+            document.createElement("li");
+        item.textContent =
+            `${track.name} – Score: ${scores[track.id]}`;
+        rankingList.appendChild(item);
+    });
 }
 
+createSpotifyEmbeds();
 updateScores();
 showNextMatch();
 </script>
