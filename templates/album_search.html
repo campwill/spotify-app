@@ -3,32 +3,29 @@
 {% block title %}Album Search{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-center bg-neutral-50 text-neutral-800 px-4 py-12 w-full">
+<div class="flex items-center justify-center px-4 py-12 w-full theme-text">
+  <form action="{{ url_for('album_results') }}" method="get" class="w-full max-w-3xl">
+    <div class="mb-2 text-[9px] tracking-[0.3em] uppercase theme-muted">
+      Album Search
+    </div>
 
-<form action="{{ url_for('album_results') }}" method="get" class="w-full max-w-3xl">
-        <div class="mb-2 text-[9px] tracking-[0.3em] uppercase text-neutral-500">
-            Album Search
-        </div>
-        <div class="flex items-center border-b border-neutral-200 focus-within:border-[#1DB954] hover:border-[#1DB954] transition-colors duration-500">
-            <input 
-                type="text"
-                name="album"
-                required
-                placeholder="Enter album name"
-                class="flex-grow bg-white text-base tracking-wide
-                      text-neutral-800 placeholder-neutral-400
-                      px-2 py-2 focus:outline-none focus:bg-white
-                      transition-colors duration-500
-                      autofill:bg-white autofill:text-neutral-800"
-                autocomplete="off"/>
-            <button 
-                type="submit"
-                class="ml-2 flex-shrink-0 text-[9px] tracking-[0.4em] uppercase
-                      text-neutral-600 hover:text-[#1DB954]
-                      transition-colors duration-500">
+    <div class="flex items-center border-b theme-border focus-within:border-[#53B577] hover:border-[#53B577] transition-colors duration-500">
+      <input
+        type="text"
+        name="album"
+        required
+        placeholder="Enter album name"
+        class="flex-grow bg-transparent theme-text text-base tracking-wide placeholder-opacity-50 px-2 py-2 focus:outline-none transition-colors duration-500"
+        autocomplete="off"
+      >
+
+      <button
+        type="submit"
+        class="ml-2 flex-shrink-0 text-[9px] tracking-[0.4em] uppercase theme-muted hover:text-[#53B577] transition-colors duration-500"
+      >
         Search
-    </button>
-    </form>
-
+      </button>
+    </div>
+  </form>
 </div>
 {% endblock %}

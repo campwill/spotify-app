@@ -3,35 +3,25 @@
 {% block title %}Top Artists{% endblock %}
 
 {% block content %}
-<div class="bg-neutral-50 text-neutral-800 px-6 py-10 w-full">
-
+<div class="theme-bg theme-text px-6 py-10 w-full">
   <div class="max-w-5xl mx-auto mb-8">
-    <div class="text-[9px] tracking-[0.3em] uppercase text-neutral-500 mb-1">
-      Spotify Stats
-    </div>
-    <h1 class="text-xl font-medium tracking-wide">
-      Select an Album
-    </h1>
+    <p class="text-[9px] tracking-[0.3em] uppercase theme-muted mb-1">Spotify Stats</p>
+    <h1 class="text-xl font-medium tracking-wide">Select an Album</h1>
   </div>
 
   <div class="max-w-5xl mx-auto space-y-2">
-
     {% for album in albums %}
-    <div
-      class="group flex items-center gap-4 p-3 rounded-lg
-             hover:bg-neutral-100 transition-colors duration-300">
+    <div class="group flex items-center gap-4 p-3 rounded-lg border border-transparent theme-hover-border hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-300">
 
-      <div class="w-6 text-right text-sm text-neutral-400">
+      <div class="w-6 text-right text-sm theme-muted">
         {{ loop.index }}
       </div>
 
       <div class="w-14 h-14 flex-shrink-0">
         {% if album.images %}
-          <img src="{{ album.images[0].url }}"
-               alt="{{ album.name }}"
-               class="w-14 h-14 rounded-full object-cover" />
+          <img src="{{ album.images[0].url }}" alt="{{ album.name }}" class="w-14 h-14 rounded-full object-cover">
         {% else %}
-          <div class="w-14 h-14 rounded-full bg-neutral-300"></div>
+          <div class="w-14 h-14 rounded-full theme-placeholder"></div>
         {% endif %}
       </div>
 
@@ -39,35 +29,22 @@
         <div class="text-sm font-medium tracking-wide truncate">
           {{ album.name }}
         </div>
-        <div class="text-sm text-neutral-500 truncate">
-          {{ album['artists'][0]['name'] }}
-          · {{ album['release_date'][:4] }}
-          · {{ album['total_tracks'] }} tracks
+        <div class="text-sm theme-muted truncate">
+          {{ album['artists'][0]['name'] }} · {{ album['release_date'][:4] }} · {{ album['total_tracks'] }} tracks
         </div>
       </div>
 
-      <div
-        class="flex gap-2 opacity-0 translate-x-2
-               group-hover:opacity-100 group-hover:translate-x-0
-               transition-all duration-200">
-        <a href="{{ url_for('album_tournament', album_id=album['id']) }}"
-           class="px-3 py-1 text-xs rounded-full
-                  border border-neutral-300 text-neutral-700
-                  hover:border-neutral-900 hover:text-neutral-900
-                  transition">
+      <div class="flex gap-2 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+        <a href="{{ url_for('album_tournament', album_id=album['id']) }}" class="px-3 py-1 text-xs rounded-full border theme-border theme-muted theme-hover-accent transition">
           Tournament
         </a>
-        <a href="{{ url_for('album_bracket', album_id=album['id']) }}"
-           class="px-3 py-1 text-xs rounded-full
-                  border border-neutral-300 text-neutral-700
-                  hover:border-neutral-900 hover:text-neutral-900
-                  transition">
+        <a href="{{ url_for('album_bracket', album_id=album['id']) }}" class="px-3 py-1 text-xs rounded-full border theme-border theme-muted theme-hover-accent transition">
           Bracket
         </a>
       </div>
+
     </div>
     {% endfor %}
-
   </div>
 </div>
 {% endblock %}

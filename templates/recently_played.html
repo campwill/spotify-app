@@ -2,63 +2,51 @@
 {% block title %}Recently Played{% endblock %}
 
 {% block content %}
-<div class="page">
-
-  <!-- Header -->
-  <div class="page-container mb-8">
-    <div class="page-eyebrow">Spotify Stats</div>
-    <h1 class="page-title">Your Recently Played Tracks</h1>
+<div class="max-w-6xl mx-auto px-6 py-10 theme-text">
+  <div class="mb-8">
+    <p class="text-[10px] tracking-[0.35em] uppercase theme-muted mb-2">Spotify Stats</p>
+    <h1 class="text-2xl font-semibold">Your Recently Played Tracks</h1>
   </div>
 
-  <form method="get" action="/recently-played" class="page-container filter-form">
-    <div class="filter-bar">
-      <div>
-        <label class="filter-label">Show</label>
-        <select name="limit" onchange="this.form.submit()" class="filter-select">
-          <option value="10" {% if limit == 10 %}selected{% endif %}>10</option>
-          <option value="25" {% if limit == 25 %}selected{% endif %}>25</option>
-          <option value="50" {% if limit == 50 %}selected{% endif %}>50</option>
-        </select>
-      </div>
+  <form method="get" action="/recently-played" class="border-b theme-border pb-6 mb-8 flex items-end">
+    <div>
+      <label for="limit" class="block text-[10px] uppercase tracking-[0.25em] theme-muted mb-2">Show</label>
+      <select id="limit" name="limit" onchange="this.form.submit()" class="theme-surface theme-text border theme-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#53B577] transition-colors duration-300">
+        <option value="10" {% if limit == 10 %}selected{% endif %}>10</option>
+        <option value="25" {% if limit == 25 %}selected{% endif %}>25</option>
+        <option value="50" {% if limit == 50 %}selected{% endif %}>50</option>
+      </select>
     </div>
   </form>
 
-  <!-- Track List -->
-  <div class="page-container list">
+  <div class="space-y-2">
     {% for item in tracks %}
     {% set track = item['track'] %}
-    <a href="{{ track.external_urls.spotify }}" target="_blank" rel="noopener noreferrer" class="block">
-      <div class="list-row">
+    <a href="{{ track.external_urls.spotify }}" target="_blank" rel="noopener noreferrer" class="block group">
+      <div class="flex items-center gap-4 px-4 py-3 rounded-lg border border-transparent theme-hover-border hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300">
+        <div class="w-8 text-center text-sm theme-muted">{{ loop.index }}</div>
 
-        <!-- Rank -->
-        <div class="list-rank">{{ loop.index }}</div>
-
-        <!-- Album Art -->
-        <div class="list-image">
+        <div class="flex-shrink-0">
           {% if track.album.images %}
-            <div class="w-14 h-14 rounded overflow-hidden bg-neutral-200">
-              <img src="{{ track.album.images[0].url }}" alt="{{ track.name }}" class="w-full h-full object-cover scale-110" />
+            <div class="w-14 h-14 rounded overflow-hidden theme-placeholder">
+              <img src="{{ track.album.images[0].url }}" alt="{{ track.name }}" class="w-full h-full object-cover scale-110">
             </div>
           {% else %}
-            <div class="w-14 h-14 rounded bg-neutral-300"></div>
+            <div class="w-14 h-14 rounded theme-placeholder"></div>
           {% endif %}
         </div>
 
-        <!-- Info -->
         <div class="flex-grow min-w-0">
-          <div class="list-title truncate">{{ track.name }}</div>
-          <div class="list-subtitle truncate">{{ track.artists | map(attribute='name') | join(', ') }}</div>
+          <div class="font-medium truncate group-hover:text-[#53B577] transition-colors duration-300">{{ track.name }}</div>
+          <div class="text-xs theme-muted truncate">{{ track.artists | map(attribute='name') | join(', ') }}</div>
         </div>
 
-        <!-- Duration -->
-        <div class="list-hint tabular-nums">
+        <div class="hidden sm:block text-xs theme-muted tabular-nums">
           Played on {{ item['played_at'] | replace("T"," at ") | replace("Z","") }}
         </div>
-
       </div>
     </a>
     {% endfor %}
   </div>
-
 </div>
 {% endblock %}

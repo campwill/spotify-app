@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Album Tournament{% endblock %}
-
 {% block content %}
-{% set ns = namespace(sizes=[], n=tracks|length) %}
 
+{% set ns = namespace(sizes=[], n=tracks|length) %}
 {% for _ in range(32) %}
   {% if ns.n > 1 %}
     {% set _ = ns.sizes.append(ns.n) %}
@@ -13,130 +12,123 @@
 {% set _ = ns.sizes.append(1) %}
 
 <style>
-.matchup::before {
-  content: "";
-  position: absolute;
-  left: -10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 120%;
-  background: #e5e7eb;
-  border-radius: 2px;
-}
-
-.winner {
-  background-color: #1DB954 !important;
-  color: white !important;
-  border-color: #1DB954 !important;
-}
-
-.loser {
-  opacity: 0.4;
-}
-
-.round li {
-  min-width: 150px;       
-  padding: 0.2rem 0.5rem; 
-  font-size: 0.75rem;     
-  margin: 0.2rem 0;       
-}
-
-.round li span {
-  width: 4px;
-  height: 4px;
-  margin-right: 0.5rem;
-}
+.matchup::before{content:"";position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:4px;height:120%;background:var(--border);border-radius:2px}
+.winner{background-color:var(--accent)!important;color:white!important;border-color:var(--accent)!important}
+.loser{opacity:.4}
+.round li{min-width:115px;max-width:115px;padding:.15rem .4rem;font-size:.65rem;margin:.15rem 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .2s ease}
+.round li:hover{border-color:var(--accent)}
+.round li span{width:4px;height:4px;margin-right:.5rem}
 </style>
 
-<div class="px-4 py-12 bg-neutral-50 text-neutral-800">
+<div class="theme-bg theme-text min-h-screen px-4 py-10">
+  <div class="max-w-7xl mx-auto mb-8">
+    <p class="text-[9px] tracking-[0.35em] uppercase theme-muted mb-2">Album Tournament</p>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold tracking-tight">March Madness Bracket</h1>
+      <p class="text-xs theme-muted">{{ album.name }}</p>
+    </div>
+  </div>
 
-  <h1 class="text-2xl font-semibold text-center mb-8">
-    March Madness Bracket
-  </h1>
+  <div class="max-w-7xl mx-auto flex gap-6 items-start">
+    <div class="theme-surface border theme-border rounded-xl overflow-hidden flex-1 min-w-0">
+      <div class="px-5 py-4 border-b theme-border flex items-center justify-between">
+        <div>
+          <p class="text-[9px] tracking-[0.3em] uppercase theme-muted">Tournament</p>
+          <p class="text-sm font-medium mt-1">Choose a winner</p>
+        </div>
+      </div>
 
-  <div class="flex mr-3 mt-16" id="bracket-container">
+      <div class="overflow-x-auto px-3 py-5" id="bracket-container">
+        <div class="flex min-w-max mr-3">
+          {% for size in ns.sizes %}
+            {% set is_first_round = loop.first %}
+            {% set is_last_round = loop.last %}
+            <ol class="flex flex-1 flex-col justify-around mx-2 round {% if is_last_round %}round-winner{% endif %}" id="round-{{ loop.index0 }}">
+              {% for i in range(size) %}
+                <li class="flex items-center theme-surface theme-text border theme-border rounded-full relative cursor-pointer transition with-connector">
+                  <span class="inline-block theme-placeholder rounded-full"></span>
+                  {% if is_last_round %}
+                    Winner
+                  {% elif is_first_round %}
+                    Placeholder
+                  {% else %}
+                    TBD
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ol>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 
-    {% for size in ns.sizes %}
-    {% set is_first_round = loop.first %}
-    {% set is_last_round = loop.last %}
-
-    <ol
-      class="flex flex-1 flex-col justify-around mx-5 round {% if is_last_round %}round-winner{% endif %}"
-      id="round-{{ loop.index0 }}"
-    >
-      {% for i in range(size) %}
-      <li class="flex items-center bg-white text-gray-900 border border-gray-300 rounded-full relative cursor-pointer transition with-connector">
-        <span class="inline-block bg-gray-300 rounded-full"></span>
-        {% if is_last_round %}
-          Winner
-        {% elif is_first_round %}
-          Placeholder
-        {% else %}
-          TBD
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ol>
-    {% endfor %}
-
+    <div class="w-[360px] flex-shrink-0 sticky top-6">
+      <div class="theme-surface border theme-border rounded-xl overflow-hidden">
+        <div class="px-5 py-4 border-b theme-border">
+          <p class="text-[9px] tracking-[0.3em] uppercase theme-muted">Listening</p>
+          <p class="text-sm font-medium mt-1 truncate">{{ album.name }}</p>
+        </div>
+        <div class="p-2">
+          <iframe data-testid="embed-iframe" style="border-radius:10px" src="https://open.spotify.com/embed/album/{{ album.id }}?utm_source=generator&theme=1" width="100%" height="400" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-const tracks = {{ tracks | tojson }};
+const tracks={{ tracks|tojson }};
 
-function fillRound(roundIndex, competitors) {
-  const round = document.querySelectorAll('.round')[roundIndex];
-  if (!round) return;
+function fillRound(roundIndex,competitors){
+  const round=document.querySelectorAll('.round')[roundIndex];
+  if(!round)return;
+  const items=round.querySelectorAll('li');
 
-  const items = round.querySelectorAll('li');
-
-  for (let i = 0; i < items.length; i++) {
-    if (i < competitors.length) {
-      items[i].lastChild.textContent = competitors[i].name;
-      items[i].dataset.trackId = competitors[i].id;
+  for(let i=0;i<items.length;i++){
+    if(i<competitors.length){
+      items[i].lastChild.textContent=competitors[i].name;
+      items[i].dataset.trackId=competitors[i].id;
       items[i].classList.remove('with-bye');
-    } else {
-      items[i].lastChild.textContent = 'BYE';
+    }else{
+      items[i].lastChild.textContent='BYE';
       items[i].removeAttribute('data-track-id');
       items[i].classList.add('with-bye');
     }
   }
 
-  for (let i = 0; i < items.length; i += 2) {
+  for(let i=0;i<items.length;i+=2){
     items[i]?.classList.add('matchup');
-    items[i + 1]?.classList.add('matchup');
+    items[i+1]?.classList.add('matchup');
   }
 }
 
-fillRound(0, tracks);
+fillRound(0,tracks);
 
-document.querySelectorAll('.round').forEach((round, roundIndex) => {
-  round.addEventListener('click', e => {
-    const item = e.target.closest('li');
-    if (!item || !item.dataset.trackId) return;
+document.querySelectorAll('.round').forEach((round,roundIndex)=>{
+  round.addEventListener('click',e=>{
+    const item=e.target.closest('li');
+    if(!item||!item.dataset.trackId)return;
 
-    const items = Array.from(round.children);
-    const index = items.indexOf(item);
-    const base = index - (index % 2);
-    const opponent = items[base === index ? base + 1 : base];
+    const items=Array.from(round.children);
+    const index=items.indexOf(item);
+    const base=index-(index%2);
+    const opponent=items[base===index?base+1:base];
 
-    items[base]?.classList.remove('winner', 'loser');
-    items[base + 1]?.classList.remove('winner', 'loser');
-
+    items[base]?.classList.remove('winner','loser');
+    items[base+1]?.classList.remove('winner','loser');
     item.classList.add('winner');
     opponent?.classList.add('loser');
 
-    const nextRound = document.querySelectorAll('.round')[roundIndex + 1];
-    if (!nextRound) return;
+    const nextRound=document.querySelectorAll('.round')[roundIndex+1];
+    if(!nextRound)return;
 
-    const nextItem = nextRound.children[Math.floor(index / 2)];
-    if (!nextItem) return;
+    const nextItem=nextRound.children[Math.floor(index/2)];
+    if(!nextItem)return;
 
-    nextItem.lastChild.textContent = item.lastChild.textContent;
-    nextItem.dataset.trackId = item.dataset.trackId;
+    nextItem.lastChild.textContent=item.lastChild.textContent;
+    nextItem.dataset.trackId=item.dataset.trackId;
   });
 });
 </script>
+
 {% endblock %}

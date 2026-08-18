@@ -25,7 +25,6 @@ const tracks = {{ tracks | tojson }};
 let scores = {};
 tracks.forEach(t => scores[t.id] = 0);
 
-// Create a shuffled array of matches
 let matchQueue = [...tracks];
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
